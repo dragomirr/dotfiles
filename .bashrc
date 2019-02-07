@@ -87,6 +87,9 @@ if [ $(which awless) ]; then
   . <(awless completion bash)
 fi
 
+if [ $(which doctl) ]; then
+  . <(doctl completion bash)
+fi
 
 export GOPATH=~/go
 
