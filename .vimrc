@@ -7,11 +7,16 @@
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 set nocompatible
+
+" Set packloadall to use vim packages
+packloadall
  
 " Attempt to determine the type of a file based on its name and possibly its
 " contents. Use this to allow intelligent auto-indenting for each filetype,
 " and for plugins that are filetype specific.
-filetype indent plugin on
+filetype off
+
+filetype plugin indent on    " required
 
 " Enable syntax highlighting
 syntax on
@@ -142,20 +147,17 @@ set tabstop=2
 " Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
 " which is the default
 map Y y$
+map <C-n> :NERDTreeToggle<CR>
  
 " Map <C-L> (redraw screen) to also turn off search highlighting until the
 " next search
 nnoremap <C-L> :nohl<CR><C-L>
-
+nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
 "------------------------------------------------------------
 " Color scheme
 colorscheme molokai
 
 "------------------------------------------------------------
-" Plugins
-
-" Markdown preview
-let g:instant_markdown_autostart = 0
 
 " Specific filetype formats
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
@@ -165,3 +167,5 @@ autocmd FileType json setlocal ts=2 sts=2 sw=2 expandtab
 autocmd FileType tf setlocal ts=2 sts=2 sw=2 expandtab
 autocmd FileType sql setlocal ts=2 sts=2 sw=2 expandtab
 autocmd FileType j2 setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType js setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType html setlocal ts=2 sts=2 sw=2 expandtab
