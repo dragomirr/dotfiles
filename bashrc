@@ -36,7 +36,7 @@ fi
 
 export GOPATH=$HOME/go
 
-export PATH=$PATH:$HOME/.local/bin:$GOPATH/bin
+export PATH=$PATH:$HOME/.local/bin:$GOPATH/bin:$HOME/.local/bin/k8s
 
 #
 # ALIASES
@@ -48,13 +48,10 @@ fi
 #
 # VARIABLES
 #
-if [ -f ~/.variables ]; then
-  . ~/.variables
+if [ -f ~/.config/variables ]; then
+  . ~/.config/variables
 fi
 
-if [ -f ~/.ci_variables ]; then
-  . ~/.ci_variables
-fi
 #
 # FUNCTIONS
 #
@@ -96,6 +93,10 @@ if ! shopt -oq posix; then
   elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
   fi
+fi
+
+if hash most 2>/dev/null ; then
+  export MANPAGER=most
 fi
 
 # enable direxpand if not enabled
