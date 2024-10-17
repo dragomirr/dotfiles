@@ -1,0 +1,11 @@
+{
+    "window.titleBarStyle": "native",
+    "toolbar.showToolbar": false,
+    "redhat.telemetry.enabled": false,
+    "git.openRepositoryInParentFolders": "always",
+    "python.defaultInterpreterPath": "/bin/python",
+    "files.associations": {
+        "**/templates/**": "ansible-jinja",
+        "**/*.yml": "ansible"
+    }
+}
