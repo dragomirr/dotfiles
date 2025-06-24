@@ -66,6 +66,10 @@ if [ $(which kubectl 2>/dev/null) ]; then
   . <(kubectl completion bash)
 fi
 
+if [ $(which helm 2>/dev/null) ]; then
+  . <(helm completion bash)
+fi
+
 if [ $(which terraform 2>/dev/null) ]; then
   complete -C $(which terraform) terraform
 fi
@@ -78,6 +82,10 @@ fi
 
 if [ $(which awless 2>/dev/null) ]; then
   . <(awless completion bash)
+fi
+
+if [[ -f ~/.config/bunny.net/config ]]; then
+  . ~/.config/bunny.net/config
 fi
 
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
