@@ -1,4 +1,32 @@
 {
+	"AWS IAM module": {
+		"prefix": "tf-aws-iam",
+		"description": "AWS IAM module",
+		"scope": "",
+		"body": [
+			"module \"${1:iam}\" {",
+			"  source = \"git::ssh://bitbucket.org/smartocto/terraform-aws-iam?ref=v${2:3.0.0}\"",
+			"",
+			"  name = \"${3:some_role}\"",
+			"  role = ${4:true}",
+			"  user = ${5:false}",
+			"",
+			"  # optional",
+			"  aws_managed_policies           = []",
+			"  assume_role_policy_identifiers = [\"ec2.amazonaws.com\"]",
+			"  instance_profile_enable        = true",
+			"  iam_policy_statement           = []",
+			"}"
+		]
+	},
+	"": {
+		"prefix": "",
+		"description": "",
+		"scope": "",
+		"body": [
+			""
+		]
+	},
 	"tf ami module": {
 		"prefix": "tf-ami-module",
 		"description": "Ami module.",
@@ -55,6 +83,42 @@
 			"\t\tbucket = \"${3:bucket}\"",
 			"\t\tkey    = \"${4:key}\"",
 			"\t\tregion = \"${5:region}\"",
+			"\t}",
+			"}"
+		]
+	},
+	"tf ec2 instance module": {
+		"prefix": "tf-ec2-instance-module",
+		"description": "Ec2 instance module.",
+		"body": [
+			"module \"${1:instance}\" {",
+			"\tsource = \"git::ssh://bitbucket.org/smartocto/terraform-aws-ec2-instance?ref=v${2:6.1.0}\"",
+			"",
+			"\tinstance_type = \"${3:t3.small}\"",
+			"",
+			"\t# optional",
+			"\tami = \"${5:ami-123}\"",
+			"\tsecurity_groups = [\"${9:sg-123}\"]",
+			"\tsubnet_id = \"${10:subnet-123}\"",
+			"\tkey_name = \"${11:key}\"",
+			"\troot_block_device_size = ${12:10}",
+			"\troot_block_device_encrypted = ${13:true}",
+			"\tcreate_eip = ${14:true}",
+			"}"
+		]
+	},
+	"tf aws data subnets": {
+		"prefix": "tf-data-subnets",
+		"description": "Default subnets.",
+		"body": [
+			"data \"aws_subnets\" \"${1:subnets}\" {",
+			"\tfilter {",
+			"\t\tname   = \"${3:vpc-id}\"",
+			"\t\tvalues = [\"${4:vpc-123}\"]",
+			"\t}",
+			"\tfilter {",
+			"\t\tname   = \"${3:default-for-az}\"",
+			"\t\tvalues = [${4:true}]",
 			"\t}",
 			"}"
 		]
