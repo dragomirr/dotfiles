@@ -155,7 +155,7 @@ nnoremap <C-L> :nohl<CR><C-L>
 nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
 "------------------------------------------------------------
 " Color scheme
-colorscheme molokai
+" colorscheme molokai
 
 "------------------------------------------------------------
 

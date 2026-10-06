@@ -25,13 +25,33 @@ HISTFILESIZE=2000
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-#
 # PS
-#
+_prompt_git_branch() {
+    local branch
+    branch=$(git branch --show-current 2>/dev/null)
+    [[ -n "$branch" ]] && printf ' \033[01;32m%s\033[00m' "$branch"
+}
+
+_terraform_workspace() {
+    [[ -d .terraform ]] || return
+
+    local workspace
+    workspace=$(terraform workspace show 2>/dev/null)
+
+    [[ -n "$workspace" ]] &&
+        printf ' \033[01;33m%s\033[00m' "$workspace"
+}
+
+_kube_context() {
+    local ctx
+    ctx=$(kubectl config current-context 2>/dev/null)
+    [[ -n "$ctx" ]] && printf ' %s' "$ctx"
+}
+
 if [[ ${EUID} == 0 ]] ; then
   PS1='\[\033[01;31m\]\h\[\033[01;34m\] \W \$\[\033[00m\] '
 else
-  PS1="\[\033[01;36m\]\w\[\033[00m\] \$(git branch 2>/dev/null | grep '^*' | colrm 1 2) \[\033[01;33m\]\$( if [[ -d .terraform ]]; then terraform workspace show; fi)\[\033[00m\]\n$ "
+  PS1='\[\033[01;36m\]\w\[\033[00m\]$(_prompt_git_branch)$(_terraform_workspace)$(_kube_context)\n$ '
 fi
 
 export GOPATH=$HOME/go
@@ -55,8 +75,8 @@ fi
 #
 # FUNCTIONS
 #
-if [ -f ~/.bash_functions ]; then
-  . ~/.bash_functions
+if [ -f ~/.functions ]; then
+  . ~/.functions
 fi
 
 #
@@ -82,6 +102,10 @@ fi
 
 if [ $(which awless 2>/dev/null) ]; then
   . <(awless completion bash)
+fi
+
+if [ $(which eksctl 2>/dev/null) ]; then
+  . <(eksctl completion bash)
 fi
 
 if [[ -f ~/.config/bunny.net/config ]]; then
@@ -113,3 +137,7 @@ if [[ ! $(shopt -s | grep -w direxpand) ]]; then
 fi
 
 export EDITOR=vim
+
+if [ $(which direnv 2>/dev/null) ]; then
+  eval "$(direnv hook bash)"
+fi
