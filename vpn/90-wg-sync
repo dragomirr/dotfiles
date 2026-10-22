@@ -1,0 +1,55 @@
+#!/bin/bash
+# NetworkManager dispatcher: start/stop the route sync timer together with a WireGuard connection.
+#
+# Install (see also wg-route-sync@.service / wg-route-sync@.timer, wg-route-sync.d/*.env):
+#   sudo install -o root -g root -m 0755 90-wg-sync /etc/NetworkManager/dispatcher.d/90-wg-sync
+#   sudo install -m 0644 wg-route-sync@.service wg-route-sync@.timer /etc/systemd/system/
+#   sudo install -d /etc/wg-route-sync && sudo install -m 0644 wg-route-sync.d/*.env /etc/wg-route-sync/
+#   sudo systemctl daemon-reload
+#
+# Logs: journalctl -u 'wg-route-sync@*'
+
+WG_INTERFACES=" eucentral1 euwest1 "
+
+IFACE="$1"
+ACTION="$2"
+
+case "$WG_INTERFACES" in
+    *" $IFACE "*) ;;
+    *) exit 0 ;;
+esac
+
+# User whose AWS credentials to use: owner of the connection (connection.permissions,
+# format "user:name;"), else the first logged-in non-system user.
+find_user() {
+    local u
+    if [ -n "$CONNECTION_UUID" ]; then
+        u=$(nmcli -g connection.permissions connection show "$CONNECTION_UUID" 2>/dev/null \
+            | sed -n 's/^user:\([^:;]*\).*/\1/p')
+        [ -n "$u" ] && { echo "$u"; return; }
+    fi
+    loginctl list-users --no-legend 2>/dev/null | awk '$1 >= 1000 { print $2; exit }'
+}
+
+ENV_DIR=/run/wg-route-sync
+ENV_FILE="$ENV_DIR/${IFACE}.env"
+
+case "$ACTION" in
+    up)
+        user=$(find_user)
+        home=$(getent passwd "$user" | cut -d: -f6)
+        install -d -m 0755 "$ENV_DIR"
+        if [ -n "$home" ]; then
+            printf 'AWS_SHARED_CREDENTIALS_FILE=%s/.aws/credentials\nAWS_CONFIG_FILE=%s/.aws/config\n' \
+                "$home" "$home" > "$ENV_FILE"
+        else
+            : > "$ENV_FILE"
+            logger -t 90-wg-sync "no user found for $IFACE, AWS credentials not configured"
+        fi
+        systemctl start --no-block "wg-route-sync@${IFACE}.timer"
+        ;;
+    down)
+        systemctl stop --no-block "wg-route-sync@${IFACE}.timer"
+        rm -f "$ENV_FILE"
+        ;;
+esac

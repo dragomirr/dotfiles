@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodically sync split-tunnel routes while WireGuard is up
+
+[Timer]
+# Started/stopped by the NetworkManager dispatcher (90-wg-sync) with the VPN.
+# First run shortly after the timer starts, then every hour.
+OnActiveSec=5s
+OnUnitActiveSec=5m
+AccuracySec=10s

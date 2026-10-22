@@ -1,0 +1,14 @@
+[Unit]
+Description=Sync split-tunnel routes for WireGuard interface %i (BunnyCDN + AWS)
+ConditionPathExists=/sys/class/net/%i
+
+[Service]
+Type=oneshot
+Environment=WG_INTERFACE=%i
+#Environment=AWS_PROFILE=default
+# Per-interface settings: AWS_REGIONS, INCLUDE_BUNNYCDN
+# Written by the dispatcher on connect: AWS_SHARED_CREDENTIALS_FILE / AWS_CONFIG_FILE of the user
+EnvironmentFile=-/run/wg-route-sync/%i.env
+EnvironmentFile=-/etc/wg-route-sync/%i.env
+ExecStart=/usr/bin/python3 /usr/local/libexec/wg-route-sync/bunnycdn_wireguard_sync.py
+TimeoutStartSec=300
