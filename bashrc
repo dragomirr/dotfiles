@@ -27,9 +27,14 @@ shopt -s checkwinsize
 
 # PS
 _prompt_git_branch() {
-    local branch
-    branch=$(git branch --show-current 2>/dev/null)
-    [[ -n "$branch" ]] && printf ' \033[01;32m%s\033[00m' "$branch"
+    local branch sha
+    branch=$(git branch --show-current 2>/dev/null) || return   # nismo u repou
+    if [[ -n "$branch" ]]; then
+        printf ' \001\033[01;32m\002%s\001\033[00m\002' "$branch"
+    else
+        sha=$(git rev-parse --short HEAD 2>/dev/null) || return
+        printf ' \001\033[01;31m\002HEAD detached at %s\001\033[00m\002' "$sha"
+    fi
 }
 
 _terraform_workspace() {
@@ -108,9 +113,9 @@ if [ $(which eksctl 2>/dev/null) ]; then
   . <(eksctl completion bash)
 fi
 
-if [[ -f ~/.config/bunny.net/config ]]; then
-  . ~/.config/bunny.net/config
-fi
+[[ -s ~/.config/bunny.net/config ]] && source ~/.config/bunny.net/config
+
+[[ -s "$HOME/.acme.sh/acme.sh.env" ]] && source "$HOME/.acme.sh/acme.sh.env"
 
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
   source /usr/local/bin/virtualenvwrapper.sh
@@ -141,3 +146,4 @@ export EDITOR=vim
 if [ $(which direnv 2>/dev/null) ]; then
   eval "$(direnv hook bash)"
 fi
+
