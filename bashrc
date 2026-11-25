@@ -61,7 +61,7 @@ fi
 
 export GOPATH=$HOME/go
 
-export PATH=$PATH:$HOME/.local/bin:$GOPATH/bin:$HOME/.local/bin/k8s
+export PATH=$PATH:$HOME/.local/bin:$GOPATH/bin:$HOME/.local/bin/k8s:$HOME/.krew/bin
 
 #
 # ALIASES
@@ -87,31 +87,19 @@ fi
 #
 # COMPLETION
 #
-if [ $(which kubectl 2>/dev/null) ]; then
-  . <(kubectl completion bash)
-fi
+_load_completion() {
+    local cmd="$1"; shift
+    command -v "$cmd" &>/dev/null && source <("$cmd" "$@" 2>/dev/null)
+}
 
-if [ $(which helm 2>/dev/null) ]; then
-  . <(helm completion bash)
-fi
+_load_completion kubectl       completion bash
+_load_completion kubectl-cnpg  completion bash
+_load_completion helm          completion bash
+_load_completion awless        completion bash
 
-if [ $(which terraform 2>/dev/null) ]; then
-  complete -C $(which terraform) terraform
-fi
-
-if [ $(which aws 2>/dev/null) ]; then
-  if [ $(which aws_completer 2>/dev/null) ]; then
-    complete -C $(which aws_completer) aws
-  fi
-fi
-
-if [ $(which awless 2>/dev/null) ]; then
-  . <(awless completion bash)
-fi
-
-if [ $(which eksctl 2>/dev/null) ]; then
-  . <(eksctl completion bash)
-fi
+# tools using "complete -C" instead of script
+command -v aws_completer &>/dev/null && complete -C aws_completer aws
+command -v terraform     &>/dev/null && complete -C "$(command -v terraform)" terraform
 
 [[ -s ~/.config/bunny.net/config ]] && source ~/.config/bunny.net/config
 
@@ -146,4 +134,3 @@ export EDITOR=vim
 if [ $(which direnv 2>/dev/null) ]; then
   eval "$(direnv hook bash)"
 fi
-
